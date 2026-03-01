@@ -568,6 +568,14 @@ static inline void unreset_block_wait(uint32_t bits) {
 #define NVIC_ICER1          (*((volatile uint32_t *)(PBB_BASE + 0x0E184)))
 
 //--------------------------------------------------------------------+
+// EPBB
+//--------------------------------------------------------------------+
+#define EPBB_BASE           0xE0080000
+
+#define NMI_MASK0           (*((volatile uint32_t *)(EPBB_BASE + 0x0)))
+#define NMI_MASK1           (*((volatile uint32_t *)(EPBB_BASE + 0x4)))
+
+//--------------------------------------------------------------------+
 // IRQ
 //--------------------------------------------------------------------+
 #define TIMER0_IRQ_0        0u
@@ -654,6 +662,7 @@ void irq_remove_handler(uint num, irq_handler_t handler) {
 }
 
 void irq_set_enabled(uint num, bool enabled) {
+
     if (enabled) {
         if (num < 32) {
             NVIC_ISER0 = (1u << num);
@@ -695,20 +704,5 @@ typedef struct {
     uint32_t next_block;            // 0, link to self, no next block
     uint32_t end_marker;            // 0xab123579, end marker
 } __attribute__((packed)) rp2350_boot_block_t;
-
-#if defined(PICO_SL_IMPLEMENTATION)
-// New lib stubs
-#include <sys/stat.h>
-void _exit(int status) { (void)status; while(1); }
-int _close(int fd) { (void)fd; return -1; }
-int _fstat(int fd, struct stat *st) { (void)fd; (void)st; return -1; }
-int _isatty(int fd) { (void)fd; return 1; }
-int _lseek(int fd, int offset, int whence) { (void)fd; (void)offset; (void)whence; return -1; }
-int _read(int fd, char *buf, int len) { (void)fd; (void)buf; (void)len; return -1; }
-int _write(int fd, char *buf, int len) { (void)fd; (void)buf; (void)len; return -1; }
-int _sbrk(int incr) { (void)incr; return -1; }
-int _kill(int pid, int sig) { (void)pid; (void)sig; return -1; }
-int _getpid(void) { return 1; }
-#endif // PICO_SL_IMPLEMENTATION
 
 #endif // PICO_H

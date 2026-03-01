@@ -2,16 +2,24 @@
 //
 // MIT License
 
-// Reset vectors and handling for the pico-sdkless tinyusb example
+// Reset vectors and handling for the pico-sdkless examples
 
 #include "pico.h"
 
 // Forward declarations
 extern void example_main(void);
 void reset(void);
-void default_handler(void);
 void isr_timer0_irq_0(void);
 void isr_usbctrl_irq(void);
+
+// Default handlers
+void default_handler(void)      { __asm volatile ("bkpt #0"); }
+void default_isr_handler(void)  { __asm volatile ("bkpt #1"); }
+void nmi_handler(void)          { __asm volatile ("bkpt #2"); }
+void hardfault_handler(void)    { __asm volatile ("bkpt #3"); }
+void memmanage_handler(void)    { __asm volatile ("bkpt #4"); }
+void busfault_handler(void)     { __asm volatile ("bkpt #5"); }
+void usagefault_handler(void)   { __asm volatile ("bkpt #6"); }
 
 // Declare stack section
 extern uint32_t _estack;
@@ -21,11 +29,11 @@ __attribute__ ((section(".vector_table"), used))
 void (* const g_pfnVectors[])(void) = {
     (void (*)(void))&_estack,      // Initial stack pointer
     reset,                         // Reset handler
-    default_handler,               // NMI handler
-    default_handler,               // Hard fault handler
-    default_handler,               // MPU fault handler
-    default_handler,               // Bus fault handler
-    default_handler,               // Usage fault handler
+    nmi_handler,                   // NMI handler
+    hardfault_handler,             // Hard fault handler
+    memmanage_handler,             // MPU fault handler
+    busfault_handler,              // Bus fault handler
+    usagefault_handler,            // Usage fault handler
     0, 0, 0, 0,                    // Reserved
     default_handler,               // SVCall handler
     default_handler,               // Debug monitor handler
@@ -35,31 +43,31 @@ void (* const g_pfnVectors[])(void) = {
 
     // Peripheral interrupt handlers follow.  See datasheet 3.2 for locations 
     // 0-3
-    isr_timer0_irq_0, default_handler, default_handler, default_handler,
+    isr_timer0_irq_0, default_isr_handler, default_isr_handler, default_isr_handler,
     // 4-7
-    default_handler, default_handler, default_handler, default_handler,
+    default_isr_handler, default_isr_handler, default_isr_handler, default_isr_handler,
     // 8-11
-    default_handler, default_handler, default_handler, default_handler,
+    default_isr_handler, default_isr_handler, default_isr_handler, default_isr_handler,
     // 12-15 - 14 = USBCTRL_IRQ
-    default_handler, default_handler, isr_usbctrl_irq, default_handler,
+    default_isr_handler, default_isr_handler, isr_usbctrl_irq, default_isr_handler,
     // 16-19
-    default_handler, default_handler, default_handler, default_handler,
+    default_isr_handler, default_isr_handler, default_isr_handler, default_isr_handler,
     // 20-23
-    default_handler, default_handler, default_handler, default_handler,
+    default_isr_handler, default_isr_handler, default_isr_handler, default_isr_handler,
     // 24-27
-    default_handler, default_handler, default_handler, default_handler,
+    default_isr_handler, default_isr_handler, default_isr_handler, default_isr_handler,
     // 28-31
-    default_handler, default_handler, default_handler, default_handler,
+    default_isr_handler, default_isr_handler, default_isr_handler, default_isr_handler,
     // 32-35
-    default_handler, default_handler, default_handler, default_handler,
+    default_isr_handler, default_isr_handler, default_isr_handler, default_isr_handler,
     // 36-39
-    default_handler, default_handler, default_handler, default_handler,
+    default_isr_handler, default_isr_handler, default_isr_handler, default_isr_handler,
     // 40-43
-    default_handler, default_handler, default_handler, default_handler,
+    default_isr_handler, default_isr_handler, default_isr_handler, default_isr_handler,
     // 44-47
-    default_handler, default_handler, default_handler, default_handler,
+    default_isr_handler, default_isr_handler, default_isr_handler, default_isr_handler,
     // 48-51
-    default_handler, default_handler, default_handler, default_handler,
+    default_isr_handler, default_isr_handler, default_isr_handler, default_isr_handler,
 };
 
 __attribute__((section(".boot_block")))
@@ -75,10 +83,7 @@ const rp2350_boot_block_t rp2350_arm_boot_block = {
     .end_marker      = 0xab123579
 };
 
-// Default handler - do nothing
-void default_handler(void) {
-    __asm volatile ("bkpt #0");
-};
+
 
 // TIMER0_IRQ_0 handler - call into the pico-sdkless handler
 void isr_timer0_irq_0(void) {

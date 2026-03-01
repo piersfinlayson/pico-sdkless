@@ -13,6 +13,7 @@
 
 #include "pico.h"
 
+#define CFG_TUSB_OS OPT_OS_NONE
 #define CFG_TUD_TASK_QUEUE_SZ     4
 #define CFG_TUD_ENDPOINT_MAX      4
 

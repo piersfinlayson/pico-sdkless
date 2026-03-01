@@ -39,7 +39,7 @@ SECTIONS
     }
     __data_load = LOADADDR(.data);
 
-    .bss (NOLOAD) : {
+    .bss _edata (NOLOAD) : {
         _sbss = .;
         *(.bss*)
         . = ALIGN(4);

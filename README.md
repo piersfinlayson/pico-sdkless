@@ -1,10 +1,14 @@
 # pico-sdkless
 
-A minimal set of self-contained header files for the Raspberry Pi Pico RP2350 to build projects without including the full Pico SDK.  Only standard C headers and `arm-gxx-none-eabi` are required to use.
+A minimal set of self-contained header files for the Raspberry Pi Pico RP2350 to build projects without including the full Pico SDK.  Only standard C headers and `arm-gcc-none-eabi` are required to use.
 
-This project currently provides sufficient headers to build tinyusb for the RP2350 without the Pico SDK.
+This project currently provides sufficient headers to build tinyusb for the RP2350 without the Pico SDK.  It is likely to be missing various other headers and definitions that may be required to build other projects, but contributions are welcome to expand the coverage of pico-sdkless.
 
 ## Usage
+
+The easiest way to get going with pico-sdkless is to start from an [example](examples/README.md).  The examples also provide a basic reset handler, vector table, linker script, Makefile and libc implementation to get you up and running.  You can copy these files into your own project and modify as needed, or you can link against them from your Makefile.
+
+Read on for instructions on how to create your own project with pico-sdkless.
 
 ### Include
 
@@ -19,7 +23,7 @@ Various other stub headers are provided in case the code you are building needs 
 
 ### IRQ support
 
-If you require IRQ support and are using pico-sdkless's built-in IRQ handlign implementation, you need to provide your own interrupt vector table and ensure that the `pico_sl_isr(irq_num)` function is called fro the appropriate interrupt handlers.  For example:
+If you require IRQ support and are using pico-sdkless's built-in IRQ handling implementation, you need to provide your own interrupt vector table and ensure that the `pico_sl_isr(irq_num)` function is called from the appropriate interrupt handlers.  For example:
 
 ```
 void isr_usbctrl(void) {
