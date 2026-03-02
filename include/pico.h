@@ -434,6 +434,14 @@ static_assert(offsetof(usb_hw_t, ints)       == 0x098, "ints offset");
 #define EP_CTRL_HOST_INTERRUPT_INTERVAL_LSB     16u
 
 //--------------------------------------------------------------------+
+// ROSC peripheral
+//--------------------------------------------------------------------+
+#define ROSC_BASE           0x400e8000
+#define ROSC_DIV                (*((volatile uint32_t *)(ROSC_BASE + 0x14)))
+
+#define ROSC_DIV_VAL(x)          (((x) & 0x7f) | 0xaa00)
+
+//--------------------------------------------------------------------+
 // Clocks peripheral
 //--------------------------------------------------------------------+
 #define CLOCKS_BASE         0x40010000
@@ -447,6 +455,7 @@ static_assert(offsetof(usb_hw_t, ints)       == 0x098, "ints offset");
 #define CLOCK_SYS_SELECTED      (*((volatile uint32_t *)(CLOCKS_BASE + 0x44)))
 #define CLOCK_ADC_CTRL          (*((volatile uint32_t *)(CLOCKS_BASE + 0x6C)))
 #define CLOCK_CLK_USB_CTRL      (*((volatile uint32_t *)(CLOCKS_BASE + 0x60)))
+#define CLOCK_CLK_USB_DIV       (*((volatile uint32_t *)(CLOCKS_BASE + 0x64)))
 
 #define CLOCK_REF_SRC_XOSC      0x02
 #define CLOCK_REF_SRC_SEL_MASK  0b1111
@@ -460,6 +469,26 @@ static_assert(offsetof(usb_hw_t, ints)       == 0x098, "ints offset");
 
 #define CLOCK_USB_CTRL_ENABLE     (1 << 11)
 #define CLOCK_USB_CTRL_AUXSRC_PLL_USB (0x0 << 5)
+
+#define CLOCK_SYS_AUX_SRC_PLL_SYS       (0x0 << 5)
+#define CLOCK_SYS_AUX_SRC_PLL_USB       (0x1 << 5)
+#define CLOCK_SYS_AUX_SRC_ROSC_CLK_SRC  (0x2 << 5)
+#define CLOCK_SYS_AUX_SRC_XOSC_CLK_SRC  (0x3 << 5)
+#define CLOCK_SYS_AUX_SRC_CLKSRC_GPIN0  (0x4 << 5)
+#define CLOCK_SYS_AUX_SRC_CLKSRC_GPIN1  (0x5 << 5)
+#define CLOCK_SYS_AUX_SRC_MASK          (0b111 << 5)
+#define CLOCK_SYS_CTRL_SRC_CLK_REF      (0 << 0)
+#define CLOCK_SYS_CTRL_SRC_CLK_AUX      (1 << 0)
+#define CLOCK_SYS_CTRL_SRC_MASK         (1 << 0)
+
+#define CLOCK_USB_DIV_MASK     (0xf << 16)
+#define CLOCK_USB_DIV_INT(X)   (((X) & 0xf) << 16)
+
+#define CLOCK_SYS_SELECTED_MASK         (0b11 << 0)
+#define CLOCK_SYS_SELECTED_CLKREF       (0x1 << 0)
+#define CLOCK_SYS_SELECTED_AUX          (0x1 << 1)
+
+#define CLOCK_CLK_REF_DIV_INT(X)        (((X) & 0xff) << 16)
 
 //--------------------------------------------------------------------+
 // XOSC peripheral
@@ -512,6 +541,7 @@ static_assert(offsetof(usb_hw_t, ints)       == 0x098, "ints offset");
 #define RESETS_RESET_OFFSET             0x00u
 #define RESETS_RESET_DONE_OFFSET        0x08u
 #define RESETS_RESET_PLL_USB_BITS       (1u << 15)
+#define RESETS_RESET_PLL_SYS_BITS       (1u << 16)
 #define RESETS_RESET_TIMER0_BITS        (1u << 23)
 #define RESETS_RESET_USBCTRL_BITS       (1u << 28)
 
