@@ -120,15 +120,8 @@ extern void panic(const char *fmt, ...);
 #define MANUFACTURER_RPI    0x927u
 #define PART_RP2            0x2u
 
-static inline uint8_t rp2040_chip_version(void) {
-    uint32_t chip_id = *((io_ro_32 *)(SYSINFO_BASE + SYSINFO_CHIP_ID_OFFSET));
-    uint32_t __unused manufacturer = chip_id & SYSINFO_CHIP_ID_MANUFACTURER_BITS;
-    uint32_t __unused part = (chip_id & SYSINFO_CHIP_ID_PART_BITS) >> SYSINFO_CHIP_ID_PART_LSB;
-    assert(manufacturer == MANUFACTURER_RPI);
-    assert(part == PART_RP2);
-    uint version = (chip_id & SYSINFO_CHIP_ID_REVISION_BITS) >> SYSINFO_CHIP_ID_REVISION_LSB;
-    return (uint8_t)version;
-}
+// Required for backwards compatibility with RP2040 SDK, and used by tinyusb
+static inline uint8_t rp2040_chip_version(void) { return 2; }
 
 //--------------------------------------------------------------------+
 // Busy wait
