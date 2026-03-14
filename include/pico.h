@@ -715,6 +715,15 @@ static inline uint32_t time_us_32(void) {
     return TIMER_TIMELR;
 }
 
+//--------------------------------------------------------------------+
+// XIP QMI support
+//--------------------------------------------------------------------+
+#define XIP_QMI_BASE        0x400d0000
+#define XIP_QMI_M0_TIMING   (*((volatile uint32_t *)(XIP_QMI_BASE + 0x0C)))
+#define XIP_QMI_M0_CLKDIV_MASK   0xFF
+#define XIP_QMI_M0_CLKDIV_SHIFT  0
+
+
 // RP2350 boot block structure
 typedef struct {
     uint32_t start_marker;          // 0xffffded3, start marker

@@ -96,6 +96,9 @@ void isr_usbctrl_irq(void) {
 }
 
 // Linker variables for the .data and .bss sections, defined in linker.ld
+extern uint32_t __ramfunc_load; // Start of .ramfunc section in flash
+extern uint32_t __ramfunc_start; // Start of .ramfunc section in RAM
+extern uint32_t __ramfunc_end;   // End of .ramfunc section in RAM
 extern uint32_t _sidata;    // Start of .data section in FLASH
 extern uint32_t _sdata;     // Start of .data section in RAM
 extern uint32_t _edata;     // End of .data section in RAM
@@ -108,6 +111,9 @@ void reset(void) {
     SCB_CPACR |= (0xF << 20); // Enable CP10 and CP11 full access
     __asm volatile ("dsb");
     __asm volatile ("isb");
+
+    // Copy ramfunc section from flash to RAM
+    memcpy(&__ramfunc_start, &__ramfunc_load, (unsigned int)(&__ramfunc_end - &__ramfunc_start));
 
     // Copy data section from flash to RAM
     memcpy(&_sdata, &_sidata, (unsigned int)((char*)&_edata - (char*)&_sdata));

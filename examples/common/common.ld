@@ -30,8 +30,17 @@ SECTIONS
         __text_end = .;
     }
 
+
+    .ramfunc ORIGIN(RAM) : AT(__text_end) {
+        __ramfunc_start = .;
+        *(.ramfunc*)
+        . = ALIGN(4);
+        __ramfunc_end = .;
+    }
+    __ramfunc_load = LOADADDR(.ramfunc);
+
     _sidata = LOADADDR(.data);
-    .data ORIGIN(RAM) : AT(__text_end) {
+    .data (__ramfunc_start + SIZEOF(.ramfunc)) : AT(__text_end + SIZEOF(.ramfunc)) {
         _sdata = .;
         *(.data*)
         . = ALIGN(4);
