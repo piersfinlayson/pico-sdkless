@@ -142,8 +142,11 @@ static inline void busy_wait_at_least_cycles(uint32_t cycles) {
 //--------------------------------------------------------------------+
 // USB endpoint / buffer count constants
 //--------------------------------------------------------------------+
+#define _USB_MAX_ENDPOINTS              16u
 #ifndef USB_MAX_ENDPOINTS
-#define USB_MAX_ENDPOINTS               16u
+// USB_MAX_ENDPOINTS can be defined earlier, to avoid applicaton code from
+// needing to allocate more RAM than required.
+#define USB_MAX_ENDPOINTS               _USB_MAX_ENDPOINTS
 #endif
 
 #ifndef USB_HOST_INTERRUPT_ENDPOINTS
@@ -180,8 +183,8 @@ typedef struct {
 
 typedef struct {
     uint8_t               setup_packet[8];                    // 0x000
-    ep_ctrl_entry_t       ep_ctrl[USB_MAX_ENDPOINTS - 1];     // 0x008
-    ep_buf_ctrl_entry_t   ep_buf_ctrl[USB_MAX_ENDPOINTS];     // 0x080
+    ep_ctrl_entry_t       ep_ctrl[_USB_MAX_ENDPOINTS - 1];    // 0x008
+    ep_buf_ctrl_entry_t   ep_buf_ctrl[_USB_MAX_ENDPOINTS];    // 0x080
     uint8_t               ep0_buf_a[0x40];                    // 0x100
     uint8_t               ep0_buf_b[0x40];                    // 0x140
     uint8_t               epx_data[0xe80];                    // 0x180

@@ -30,7 +30,6 @@ SECTIONS
         __text_end = .;
     }
 
-
     .ramfunc ORIGIN(RAM) : AT(__text_end) {
         __ramfunc_start = .;
         *(.ramfunc*)
