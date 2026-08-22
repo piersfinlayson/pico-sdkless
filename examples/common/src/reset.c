@@ -95,15 +95,17 @@ void isr_usbctrl_irq(void) {
     pico_sl_isr(USBCTRL_IRQ);
 }
 
-// Linker variables for the .data and .bss sections, defined in linker.ld
-extern uint32_t __ramfunc_load; // Start of .ramfunc section in flash
-extern uint32_t __ramfunc_start; // Start of .ramfunc section in RAM
-extern uint32_t __ramfunc_end;   // End of .ramfunc section in RAM
-extern uint32_t _sidata;    // Start of .data section in FLASH
-extern uint32_t _sdata;     // Start of .data section in RAM
-extern uint32_t _edata;     // End of .data section in RAM
-extern uint32_t _sbss;      // Start of .bss section in RAM
-extern uint32_t _ebss;      // End of .bss section in RAM
+// Linker variables for the .ramfunc, .data and .bss sections, defined in
+// common.ld.  Declared char so that subtracting a pair gives a length in
+// bytes - the unit memcpy() and memset() take.
+extern char __ramfunc_load; // Start of .ramfunc section in flash
+extern char __ramfunc_start; // Start of .ramfunc section in RAM
+extern char __ramfunc_end;   // End of .ramfunc section in RAM
+extern char _sidata;    // Start of .data section in FLASH
+extern char _sdata;     // Start of .data section in RAM
+extern char _edata;     // End of .data section in RAM
+extern char _sbss;      // Start of .bss section in RAM
+extern char _ebss;      // End of .bss section in RAM
 
 // Reset handler
 void reset(void) {
@@ -116,10 +118,10 @@ void reset(void) {
     memcpy(&__ramfunc_start, &__ramfunc_load, (unsigned int)(&__ramfunc_end - &__ramfunc_start));
 
     // Copy data section from flash to RAM
-    memcpy(&_sdata, &_sidata, (unsigned int)((char*)&_edata - (char*)&_sdata));
+    memcpy(&_sdata, &_sidata, (unsigned int)(&_edata - &_sdata));
     
     // Zero out bss section  
-    memset(&_sbss, 0, (unsigned int)((char*)&_ebss - (char*)&_sbss));
+    memset(&_sbss, 0, (unsigned int)(&_ebss - &_sbss));
     
     // Call the main function
     example_main();
